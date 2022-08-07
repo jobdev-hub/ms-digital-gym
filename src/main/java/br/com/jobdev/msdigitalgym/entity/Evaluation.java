@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class PhysicalEvaluation {
+public class Evaluation {
 
     @Id
     @org.hibernate.annotations.Type(type = "pg-uuid")

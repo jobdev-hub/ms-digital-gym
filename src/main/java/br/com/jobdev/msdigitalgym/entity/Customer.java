@@ -34,6 +34,6 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<PhysicalEvaluation> assessmentList = new ArrayList<>();
+    private List<Evaluation> assessmentList = new ArrayList<>();
 
 }
