@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@OpenAPIDefinition(info = @Info(title = "API - Academia Digital", version = "1.0.0"))
+@OpenAPIDefinition(info = @Info(title = "Microservice: Digital Gym", version = "1.0.0"))
 public class MsDigitalGymApplication {
 
     public static void main(String[] args) {
