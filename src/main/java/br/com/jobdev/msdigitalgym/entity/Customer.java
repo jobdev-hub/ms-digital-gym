@@ -1,6 +1,7 @@
 package br.com.jobdev.msdigitalgym.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,8 @@ import java.util.UUID;
 public class Customer {
 
     @Id
-    @org.hibernate.annotations.Type(type = "pg-uuid")
+    @GeneratedValue(generator = "UUIDGenerator")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
     private String name;
@@ -34,6 +36,10 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Evaluation> assessmentList = new ArrayList<>();
+    private List<Evaluation> evaluations = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "signature_id")
+    private Signature signature;
 
 }

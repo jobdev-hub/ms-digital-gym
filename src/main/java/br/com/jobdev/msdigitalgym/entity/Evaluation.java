@@ -1,14 +1,12 @@
 package br.com.jobdev.msdigitalgym.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,17 +18,18 @@ import java.util.UUID;
 public class Evaluation {
 
     @Id
-    @org.hibernate.annotations.Type(type = "pg-uuid")
+    @GeneratedValue(generator = "UUIDGenerator")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
-
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
 
     private LocalDateTime dateTime = LocalDateTime.now();
 
     private double weight;
 
     private double height;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
 }

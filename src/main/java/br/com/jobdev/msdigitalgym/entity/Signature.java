@@ -1,5 +1,6 @@
 package br.com.jobdev.msdigitalgym.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,14 @@ import java.util.UUID;
 public class Signature {
 
     @Id
-    @org.hibernate.annotations.Type(type = "pg-uuid")
+    @GeneratedValue(generator = "UUIDGenerator")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    private LocalDateTime creatAt = LocalDateTime.now();
 
-    private LocalDateTime dateTime = LocalDateTime.now();
+    private LocalDateTime updateAt = LocalDateTime.now();
+
+    private Boolean active = true;
+
 }
