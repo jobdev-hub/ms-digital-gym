@@ -11,9 +11,7 @@ public interface CustomerInterface<T> {
 
     List<T> findAll();
 
-    List<T> findAllActive();
-
-    List<T> findAllInactive();
+    List<T> findAllBySignatureActive(boolean active);
 
     T update(UUID id, T t);
 

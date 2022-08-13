@@ -36,13 +36,8 @@ public class CustomerService implements CustomerInterface<Customer> {
     }
 
     @Override
-    public List<Customer> findAllActive() {
-        return customerRepository.findAllBySignatureActiveTrue();
-    }
-
-    @Override
-    public List<Customer> findAllInactive() {
-        return customerRepository.findAllBySignatureActiveFalse();
+    public List<Customer> findAllBySignatureActive(boolean active) {
+        return customerRepository.findAllBySignatureActive(active);
     }
 
     @Override
