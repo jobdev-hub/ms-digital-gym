@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -22,9 +24,11 @@ public class Signature {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createAt = LocalDateTime.now();
 
-    private LocalDateTime updateAt = LocalDateTime.now();
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime updateAt = null;
 
     private Boolean active = true;
 

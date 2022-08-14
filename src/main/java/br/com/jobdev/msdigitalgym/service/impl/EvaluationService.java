@@ -25,8 +25,8 @@ public class EvaluationService implements EvaluationInterface<Evaluation> {
 
     @Override
     public ResponseEntity<UUID> createByCustomerId(Evaluation evaluation, UUID customerId) {
-        evaluation.setCustomer(customerService.findById(evaluation.getCustomer().getId()).getBody());
         try {
+            evaluation.setCustomer(customerService.findById(evaluation.getCustomer().getId()).getBody());
             evaluationRepository.save(evaluation);
             return ResponseEntity.ok(evaluation.getId());
         } catch (Exception e) {

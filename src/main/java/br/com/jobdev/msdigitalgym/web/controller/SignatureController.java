@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,8 +24,8 @@ public class SignatureController {
         return signatureService.findResume();
     }
 
-    @PutMapping("/upkeep/update-active/{id}")
-    public ResponseEntity<UUID> update(@PathVariable UUID id, @PathParam("active") boolean active) {
-        return signatureService.update(id, active);
+    @PutMapping("/upkeep/delete-inactive/{id}")
+    public ResponseEntity<UUID> upkeepDeleteInactive(@PathVariable UUID id) {
+        return signatureService.upkeepDeleteInactive(id);
     }
 }

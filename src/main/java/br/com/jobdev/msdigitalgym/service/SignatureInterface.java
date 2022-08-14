@@ -9,6 +9,6 @@ public interface SignatureInterface<T> {
 
     ResponseEntity<Map<String, Integer>> findResume();
 
-    ResponseEntity<UUID> update(UUID id, boolean active);
+    ResponseEntity<UUID> upkeepDeleteInactive(UUID id);
 
 }

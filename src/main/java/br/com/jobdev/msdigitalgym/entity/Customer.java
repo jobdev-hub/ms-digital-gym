@@ -38,7 +38,7 @@ public class Customer {
     @JsonIgnore
     private List<Evaluation> evaluations = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "signature_id")
     private Signature signature;
 

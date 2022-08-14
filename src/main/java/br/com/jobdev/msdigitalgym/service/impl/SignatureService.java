@@ -24,20 +24,25 @@ public class SignatureService implements SignatureInterface<Signature> {
 
     @Override
     public ResponseEntity<Map<String, Integer>> findResume() {
-        Map<String, Integer> resume = Map.of("active", signatureRepository.countByActive(true), "inactive", signatureRepository.countByActive(false));
-        return ResponseEntity.ok(resume);
+        try {
+            return ResponseEntity.ok(Map.of(
+                    "active", signatureRepository.countByActive(true),
+                    "inactive", signatureRepository.countByActive(false))
+            );
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @Override
-    public ResponseEntity<UUID> update(UUID id, boolean active) {
+    public ResponseEntity<UUID> upkeepDeleteInactive(UUID id) {
 
         Optional<Signature> signatureQuery = signatureRepository.findById(id);
 
         if (signatureQuery.isPresent()) {
-            Signature signatureToSave = signatureQuery.get();
-            signatureToSave.setActive(active);
-            signatureRepository.save(signatureToSave);
-            return ResponseEntity.ok(signatureToSave.getId());
+            UUID idFound = signatureQuery.get().getId();
+            signatureRepository.deleteById(idFound);
+            return ResponseEntity.ok(idFound);
         }
 
         return ResponseEntity.notFound().build();

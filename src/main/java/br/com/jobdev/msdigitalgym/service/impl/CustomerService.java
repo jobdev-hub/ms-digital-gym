@@ -1,13 +1,14 @@
 package br.com.jobdev.msdigitalgym.service.impl;
 
 import br.com.jobdev.msdigitalgym.entity.Customer;
+import br.com.jobdev.msdigitalgym.entity.Signature;
 import br.com.jobdev.msdigitalgym.repository.CustomerRepository;
 import br.com.jobdev.msdigitalgym.service.CustomerInterface;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,30 +26,34 @@ public class CustomerService implements CustomerInterface<Customer> {
     @Override
     public ResponseEntity<UUID> create(Customer customer) {
         try {
-            customerRepository.save(customer);
-            return new ResponseEntity<>(customer.getId(), HttpStatus.OK);
+            return ResponseEntity.ok(customerRepository.save(customer).getId());
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError().build();
         }
-
     }
 
     @Override
     public ResponseEntity<Customer> findById(UUID id) {
         Optional<Customer> customer = customerRepository.findById(id);
-        return customer.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Override
     public ResponseEntity<List<Customer>> findAll() {
-        List<Customer> customers = customerRepository.findAll();
-        return new ResponseEntity<>(customers, HttpStatus.OK);
+        try {
+            return ResponseEntity.ok(customerRepository.findAll());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @Override
     public ResponseEntity<List<Customer>> findAllBySignatureActive(boolean active) {
-        List<Customer> customers = customerRepository.findAllBySignatureActive(active);
-        return new ResponseEntity<>(customers, HttpStatus.OK);
+        try {
+            return ResponseEntity.ok(customerRepository.findAllBySignatureActive(active));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @Override
@@ -59,19 +64,21 @@ public class CustomerService implements CustomerInterface<Customer> {
         if (customerQuery.isPresent()) {
 
             Customer customerToSave = customerQuery.get();
+            Signature signatureToSave = customerToSave.getSignature();
 
+            signatureToSave.setActive(customerBodyRequest.getSignature().getActive());
+            signatureToSave.setUpdateAt(LocalDateTime.now());
+
+            customerToSave.setSignature(signatureToSave);
             customerToSave.setName(customerBodyRequest.getName());
             customerToSave.setCpf(customerBodyRequest.getCpf());
             customerToSave.setDistrict(customerBodyRequest.getDistrict());
             customerToSave.setBirthDate(customerBodyRequest.getBirthDate());
 
-            // todo: update signature from customerBodyRequest
-
-            customerRepository.save(customerToSave);
-            return new ResponseEntity<>(customerToSave, HttpStatus.OK);
+            return ResponseEntity.ok(customerRepository.save(customerToSave));
         }
 
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return ResponseEntity.notFound().build();
     }
 
     @Override
@@ -79,8 +86,8 @@ public class CustomerService implements CustomerInterface<Customer> {
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isPresent()) {
             customerRepository.delete(customer.get());
-            return new ResponseEntity<>(id, HttpStatus.OK);
+            return ResponseEntity.ok(id);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return ResponseEntity.notFound().build();
     }
 }
