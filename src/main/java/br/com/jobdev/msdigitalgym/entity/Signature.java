@@ -22,7 +22,7 @@ public class Signature {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
-    private LocalDateTime creatAt = LocalDateTime.now();
+    private LocalDateTime createAt = LocalDateTime.now();
 
     private LocalDateTime updateAt = LocalDateTime.now();
 

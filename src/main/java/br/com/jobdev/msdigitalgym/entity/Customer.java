@@ -34,11 +34,11 @@ public class Customer {
 
     private LocalDate birthDate;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Evaluation> evaluations = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "signature_id")
     private Signature signature;
 
