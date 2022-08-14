@@ -4,6 +4,8 @@ import br.com.jobdev.msdigitalgym.entity.Customer;
 import br.com.jobdev.msdigitalgym.repository.CustomerRepository;
 import br.com.jobdev.msdigitalgym.service.CustomerInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,27 +23,36 @@ public class CustomerService implements CustomerInterface<Customer> {
     }
 
     @Override
-    public Customer create(Customer customer) {
-        return customerRepository.save(customer);
+    public ResponseEntity<UUID> create(Customer customer) {
+        try {
+            customerRepository.save(customer);
+            return new ResponseEntity<>(customer.getId(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @Override
-    public Customer findById(UUID id) {
-        return customerRepository.findById(id).orElse(null);
+    public ResponseEntity<Customer> findById(UUID id) {
+        Optional<Customer> customer = customerRepository.findById(id);
+        return customer.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public List<Customer> findAll() {
-        return customerRepository.findAll();
+    public ResponseEntity<List<Customer>> findAll() {
+        List<Customer> customers = customerRepository.findAll();
+        return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
     @Override
-    public List<Customer> findAllBySignatureActive(boolean active) {
-        return customerRepository.findAllBySignatureActive(active);
+    public ResponseEntity<List<Customer>> findAllBySignatureActive(boolean active) {
+        List<Customer> customers = customerRepository.findAllBySignatureActive(active);
+        return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
     @Override
-    public Customer update(UUID id, Customer customerBodyRequest) {
+    public ResponseEntity<Customer> update(UUID id, Customer customerBodyRequest) {
 
         Optional<Customer> customerQuery = customerRepository.findById(id);
 
@@ -56,14 +67,20 @@ public class CustomerService implements CustomerInterface<Customer> {
 
             // todo: update signature from customerBodyRequest
 
-            return customerRepository.save(customerToSave);
+            customerRepository.save(customerToSave);
+            return new ResponseEntity<>(customerToSave, HttpStatus.OK);
         }
 
-        return null;
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @Override
-    public void deleteById(UUID id) {
-        customerRepository.deleteById(id);
+    public ResponseEntity<UUID> deleteById(UUID id) {
+        Optional<Customer> customer = customerRepository.findById(id);
+        if (customer.isPresent()) {
+            customerRepository.delete(customer.get());
+            return new ResponseEntity<>(id, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

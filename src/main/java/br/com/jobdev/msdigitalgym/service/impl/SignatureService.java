@@ -1,15 +1,12 @@
 package br.com.jobdev.msdigitalgym.service.impl;
 
-import br.com.jobdev.msdigitalgym.entity.Customer;
 import br.com.jobdev.msdigitalgym.entity.Signature;
-import br.com.jobdev.msdigitalgym.repository.CustomerRepository;
 import br.com.jobdev.msdigitalgym.repository.SignatureRepository;
-import br.com.jobdev.msdigitalgym.service.CustomerInterface;
 import br.com.jobdev.msdigitalgym.service.SignatureInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,17 +23,24 @@ public class SignatureService implements SignatureInterface<Signature> {
 
 
     @Override
-    public List<Map<String, Integer>> findResume() {
-        return null;
+    public ResponseEntity<Map<String, Integer>> findResume() {
+        Map<String, Integer> resume = Map.of("active", signatureRepository.countByActive(true), "inactive", signatureRepository.countByActive(false));
+        return ResponseEntity.ok(resume);
     }
 
     @Override
-    public Signature update(UUID id, boolean active) {
-        return null;
+    public ResponseEntity<UUID> update(UUID id, boolean active) {
+
+        Optional<Signature> signatureQuery = signatureRepository.findById(id);
+
+        if (signatureQuery.isPresent()) {
+            Signature signatureToSave = signatureQuery.get();
+            signatureToSave.setActive(active);
+            signatureRepository.save(signatureToSave);
+            return ResponseEntity.ok(signatureToSave.getId());
+        }
+
+        return ResponseEntity.notFound().build();
     }
 
-    @Override
-    public void deleteById(UUID id) {
-
-    }
 }

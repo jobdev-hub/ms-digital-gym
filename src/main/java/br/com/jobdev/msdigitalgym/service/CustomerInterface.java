@@ -1,20 +1,22 @@
 package br.com.jobdev.msdigitalgym.service;
 
+import org.springframework.http.ResponseEntity;
+
 import java.util.List;
 import java.util.UUID;
 
 public interface CustomerInterface<T> {
 
-    T create(T t);
+    ResponseEntity<UUID> create(T t);
 
-    T findById(UUID id);
+    ResponseEntity<T> findById(UUID id);
 
-    List<T> findAll();
+    ResponseEntity<List<T>> findAll();
 
-    List<T> findAllBySignatureActive(boolean active);
+    ResponseEntity<List<T>> findAllBySignatureActive(boolean active);
 
-    T update(UUID id, T t);
+    ResponseEntity<T> update(UUID id, T t);
 
-    void deleteById(UUID id);
+    ResponseEntity<UUID> deleteById(UUID id);
 
 }

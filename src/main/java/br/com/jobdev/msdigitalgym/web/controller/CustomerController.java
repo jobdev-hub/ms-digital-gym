@@ -2,6 +2,7 @@ package br.com.jobdev.msdigitalgym.web.controller;
 
 import br.com.jobdev.msdigitalgym.entity.Customer;
 import br.com.jobdev.msdigitalgym.service.impl.CustomerService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
@@ -19,33 +20,33 @@ public class CustomerController {
     }
 
     @PostMapping("/create")
-    public Customer create(@RequestBody Customer customer) {
+    public ResponseEntity<UUID> create(@RequestBody Customer customer) {
         return customerService.create(customer);
     }
 
     @GetMapping("/findById/{id}")
-    public Customer findById(@PathVariable UUID id) {
+    public ResponseEntity<Customer> findById(@PathVariable UUID id) {
         return customerService.findById(id);
     }
 
     @GetMapping("/findAll")
-    public List<Customer> findAll() {
+    public ResponseEntity<List<Customer>> findAll() {
         return customerService.findAll();
     }
 
     @GetMapping("/findAllBySignatureActive")
-    public List<Customer> findAllBySignatureActive(@PathParam("active") boolean active) {
+    public ResponseEntity<List<Customer>> findAllBySignatureActive(@PathParam("active") boolean active) {
         return customerService.findAllBySignatureActive(active);
     }
 
     @PutMapping("/update/{id}")
-    public Customer update(@PathVariable UUID id, @RequestBody Customer customer) {
+    public ResponseEntity<Customer> update(@PathVariable UUID id, @RequestBody Customer customer) {
         return customerService.update(id, customer);
     }
 
     @DeleteMapping("/deleteById/{id}")
-    public void deleteById(@PathVariable UUID id) {
-        customerService.deleteById(id);
+    public ResponseEntity<UUID> deleteById(@PathVariable UUID id) {
+        return customerService.deleteById(id);
     }
 
 }
