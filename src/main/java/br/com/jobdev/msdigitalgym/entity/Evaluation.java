@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -37,7 +36,6 @@ public class Evaluation {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     @JsonIgnore
-    @NotNull
     private Customer customer;
 
 }

@@ -1,6 +1,8 @@
 package br.com.jobdev.msdigitalgym.service.impl;
 
+import br.com.jobdev.msdigitalgym.entity.Customer;
 import br.com.jobdev.msdigitalgym.entity.Evaluation;
+import br.com.jobdev.msdigitalgym.repository.CustomerRepository;
 import br.com.jobdev.msdigitalgym.repository.EvaluationRepository;
 import br.com.jobdev.msdigitalgym.service.EvaluationInterface;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +17,26 @@ import java.util.UUID;
 public class EvaluationService implements EvaluationInterface<Evaluation> {
 
     private final EvaluationRepository evaluationRepository;
-    private final CustomerService customerService;
+    private final CustomerRepository customerRepository;
 
     @Autowired
-    public EvaluationService(EvaluationRepository evaluationRepository, CustomerService customerService) {
+    public EvaluationService(EvaluationRepository evaluationRepository, CustomerRepository customerRepository) {
         this.evaluationRepository = evaluationRepository;
-        this.customerService = customerService;
+
+        this.customerRepository = customerRepository;
     }
 
     @Override
     public ResponseEntity<UUID> createByCustomerId(Evaluation evaluation, UUID customerId) {
         try {
-            evaluation.setCustomer(customerService.findById(evaluation.getCustomer().getId()).getBody());
-            evaluationRepository.save(evaluation);
-            return ResponseEntity.ok(evaluation.getId());
+            Optional<Customer> customerQuery = customerRepository.findById(customerId);
+            if (customerQuery.isPresent()) {
+                evaluation.setCustomer(customerQuery.get());
+                evaluationRepository.save(evaluation);
+                return ResponseEntity.ok(evaluation.getId());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -36,32 +44,24 @@ public class EvaluationService implements EvaluationInterface<Evaluation> {
 
     @Override
     public ResponseEntity<List<Evaluation>> findByCustomerId(UUID customerId) {
-        return ResponseEntity.ok(evaluationRepository.findByCustomerId(customerId));
+        try {
+            return ResponseEntity.ok(evaluationRepository.findByCustomerId(customerId));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @Override
-    public ResponseEntity<UUID> update(UUID id, Evaluation evaluationBodyRequest) {
-        Optional<Evaluation> evaluationQuery = evaluationRepository.findById(id);
-
-        if (evaluationQuery.isPresent()) {
-            Evaluation evaluationToSave = evaluationQuery.get();
-            evaluationToSave.setHeight(evaluationBodyRequest.getHeight());
-            evaluationToSave.setWeight(evaluationBodyRequest.getWeight());
-            evaluationToSave.setDateTime(evaluationBodyRequest.getDateTime());
-            evaluationRepository.save(evaluationToSave);
-            return ResponseEntity.ok(evaluationToSave.getId());
+    public ResponseEntity<?> deleteById(UUID id) {
+        try {
+            Optional<Evaluation> evaluationQuery = evaluationRepository.findById(id);
+            if (evaluationQuery.isPresent()) {
+                evaluationRepository.deleteById(id);
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.notFound().build();
-    }
-
-    @Override
-    public ResponseEntity<UUID> deleteById(UUID id) {
-        Optional<Evaluation> evaluationQuery = evaluationRepository.findById(id);
-
-        if (evaluationQuery.isPresent()) {
-            evaluationRepository.deleteById(id);
-            return ResponseEntity.ok(id);
-        }
-        return ResponseEntity.notFound().build();
     }
 }

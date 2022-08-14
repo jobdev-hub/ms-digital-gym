@@ -1,5 +1,6 @@
 package br.com.jobdev.msdigitalgym.entity;
 
+import br.com.jobdev.msdigitalgym.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -9,9 +10,6 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.br.CPF;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,4 +48,9 @@ public class Customer {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "signature_id")
     private Signature signature;
+
+    // Custom getCpf
+    public String getCpf() {
+        return StringUtils.formatCpf(cpf);
+    }
 }

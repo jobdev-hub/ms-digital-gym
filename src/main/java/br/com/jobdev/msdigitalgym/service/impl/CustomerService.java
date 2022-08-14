@@ -27,31 +27,31 @@ public class CustomerService implements CustomerInterface<Customer> {
     @Override
     public ResponseEntity<?> create(Customer customer) {
         try {
-            customer.setCpf(StringUtils.keepNumbersOnly(customer.getCpf()));
-            customerRepository.findByCpf(customer.getCpf()).ifPresent(c -> {
-                throw new IllegalArgumentException("CPF already exists");
-            });
-            return ResponseEntity.ok(customerRepository.save(customer).getId());
-        } catch (IllegalArgumentException e) {
-            return e.getMessage().equals("CPF already exists") ? ResponseEntity.badRequest().body(e.getMessage()) : ResponseEntity.status(500).build();
+            customer.setCpf(customer.getCpf());
+            checkIfCpfAlreadyExists(customer);
+            return ResponseEntity.ok(customerRepository.save(customer));
+        } catch (Exception e) {
+            return responseByExceptionAndRules(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<Customer> findById(UUID id) {
+        try {
+            Optional<Customer> customer = customerRepository.findById(id);
+            return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
 
     @Override
-    public ResponseEntity<Customer> findById(UUID id) {
-        Optional<Customer> customer = customerRepository.findById(id);
-        return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @Override
     public ResponseEntity<Customer> findByCpf(String cpf) {
-        Optional<Customer> customer = customerRepository.findByCpf(cpf);
-        if (customer.isPresent()) {
-            return ResponseEntity.ok(customer.get());
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            Optional<Customer> customer = customerRepository.findByCpf(StringUtils.formatCpf(cpf));
+            return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -74,37 +74,67 @@ public class CustomerService implements CustomerInterface<Customer> {
     }
 
     @Override
-    public ResponseEntity<Customer> update(UUID id, Customer customerBodyRequest) {
+    public ResponseEntity<?> update(UUID id, Customer customerBodyRequest) {
+        try {
+            Optional<Customer> customerQuery = customerRepository.findById(id);
+            if (customerQuery.isPresent()) {
 
-        Optional<Customer> customerQuery = customerRepository.findById(id);
+                //Query
+                Customer customerToSave = customerQuery.get();
+                Signature signatureToSave = customerToSave.getSignature();
 
-        if (customerQuery.isPresent()) {
+                //Rule Unique Cpf
+                if (!customerToSave.getCpf().equals(customerBodyRequest.getCpf())) {
+                    checkIfCpfAlreadyExists(customerBodyRequest);
+                }
 
-            Customer customerToSave = customerQuery.get();
-            Signature signatureToSave = customerToSave.getSignature();
+                //Update
+                signatureToSave.setActive(customerBodyRequest.getSignature().getActive());
+                signatureToSave.setUpdateAt(LocalDateTime.now());
+                customerToSave.setSignature(signatureToSave);
+                customerToSave.setName(customerBodyRequest.getName());
+                customerToSave.setCpf(customerBodyRequest.getCpf());
+                customerToSave.setDistrict(customerBodyRequest.getDistrict());
+                customerToSave.setBirthDate(customerBodyRequest.getBirthDate());
 
-            signatureToSave.setActive(customerBodyRequest.getSignature().getActive());
-            signatureToSave.setUpdateAt(LocalDateTime.now());
+                //Save
+                return ResponseEntity.ok(customerRepository.save(customerToSave));
 
-            customerToSave.setSignature(signatureToSave);
-            customerToSave.setName(customerBodyRequest.getName());
-            customerToSave.setCpf(StringUtils.keepNumbersOnly(customerBodyRequest.getCpf()));
-            customerToSave.setDistrict(customerBodyRequest.getDistrict());
-            customerToSave.setBirthDate(customerBodyRequest.getBirthDate());
-
-            return ResponseEntity.ok(customerRepository.save(customerToSave));
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return responseByExceptionAndRules(e.getMessage());
         }
-
-        return ResponseEntity.notFound().build();
     }
 
     @Override
-    public ResponseEntity<UUID> deleteById(UUID id) {
-        Optional<Customer> customer = customerRepository.findById(id);
-        if (customer.isPresent()) {
-            customerRepository.delete(customer.get());
-            return ResponseEntity.ok(id);
+    public ResponseEntity<?> deleteById(UUID id) {
+        try {
+            Optional<Customer> customer = customerRepository.findById(id);
+            if (customer.isPresent()) {
+                customerRepository.delete(customer.get());
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.notFound().build();
+    }
+
+    private ResponseEntity<?> responseByExceptionAndRules(String exMessage) {
+
+        // Rule 1: CPF already exists
+        if (exMessage.contains("CPF already exists")) {
+            return ResponseEntity.badRequest().body(exMessage);
+        }
+
+        // Default
+        return ResponseEntity.internalServerError().build();
+    }
+
+    private void checkIfCpfAlreadyExists(Customer customerBodyRequest) {
+        customerRepository.findByCpf(customerBodyRequest.getCpf()).ifPresent(c -> {
+            throw new IllegalArgumentException("CPF already exists");
+        });
     }
 }

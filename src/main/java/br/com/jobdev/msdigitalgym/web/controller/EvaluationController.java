@@ -22,7 +22,7 @@ public class EvaluationController {
     }
 
     @PostMapping("/create/{customerId}")
-    public ResponseEntity<UUID> create(@PathVariable UUID customerId, @Valid @RequestBody Evaluation evaluation) {
+    public ResponseEntity<UUID> create(@PathVariable UUID customerId,@Valid @RequestBody Evaluation evaluation) {
         return evaluationService.createByCustomerId(evaluation, customerId);
     }
 
@@ -31,13 +31,8 @@ public class EvaluationController {
         return evaluationService.findByCustomerId(customerId);
     }
 
-    @PutMapping("/update/{customerId}")
-    public ResponseEntity<UUID> update(@PathVariable UUID customerId, @Valid @RequestBody Evaluation evaluation) {
-        return evaluationService.update(customerId, evaluation);
-    }
-
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<UUID> deleteById(@PathVariable UUID id) {
+    public ResponseEntity<?> deleteById(@PathVariable UUID id) {
         return evaluationService.deleteById(id);
     }
 
