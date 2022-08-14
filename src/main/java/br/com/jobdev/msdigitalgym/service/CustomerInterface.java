@@ -11,6 +11,8 @@ public interface CustomerInterface<T> {
 
     ResponseEntity<T> findById(UUID id);
 
+    ResponseEntity<T> findByCpf(String cpf);
+
     ResponseEntity<List<T>> findAll();
 
     ResponseEntity<List<T>> findAllBySignatureActive(boolean active);

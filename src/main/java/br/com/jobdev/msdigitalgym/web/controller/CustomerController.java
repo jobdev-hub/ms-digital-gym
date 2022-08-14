@@ -30,6 +30,11 @@ public class CustomerController {
         return customerService.findById(id);
     }
 
+    @GetMapping("/findByCpf")
+    public ResponseEntity<Customer> findByCpf(@RequestParam String cpf) {
+        return customerService.findByCpf(cpf);
+    }
+
     @GetMapping("/findAll")
     public ResponseEntity<List<Customer>> findAll() {
         return customerService.findAll();

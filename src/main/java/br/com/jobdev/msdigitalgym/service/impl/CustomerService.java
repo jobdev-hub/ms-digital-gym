@@ -46,6 +46,16 @@ public class CustomerService implements CustomerInterface<Customer> {
     }
 
     @Override
+    public ResponseEntity<Customer> findByCpf(String cpf) {
+        Optional<Customer> customer = customerRepository.findByCpf(cpf);
+        if (customer.isPresent()) {
+            return ResponseEntity.ok(customer.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Override
     public ResponseEntity<List<Customer>> findAll() {
         try {
             return ResponseEntity.ok(customerRepository.findAll());
@@ -78,7 +88,7 @@ public class CustomerService implements CustomerInterface<Customer> {
 
             customerToSave.setSignature(signatureToSave);
             customerToSave.setName(customerBodyRequest.getName());
-            customerToSave.setCpf(customerBodyRequest.getCpf());
+            customerToSave.setCpf(StringUtils.keepNumbersOnly(customerBodyRequest.getCpf()));
             customerToSave.setDistrict(customerBodyRequest.getDistrict());
             customerToSave.setBirthDate(customerBodyRequest.getBirthDate());
 
