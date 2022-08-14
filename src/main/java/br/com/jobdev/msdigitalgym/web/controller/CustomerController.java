@@ -5,6 +5,7 @@ import br.com.jobdev.msdigitalgym.service.impl.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +21,7 @@ public class CustomerController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<UUID> create(@RequestBody Customer customer) {
+    public ResponseEntity<?> create(@Valid @RequestBody Customer customer) {
         return customerService.create(customer);
     }
 
@@ -40,7 +41,7 @@ public class CustomerController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Customer> update(@PathVariable UUID id, @RequestBody Customer customer) {
+    public ResponseEntity<Customer> update(@PathVariable UUID id, @Valid @RequestBody Customer customer) {
         return customerService.update(id, customer);
     }
 

@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface CustomerInterface<T> {
 
-    ResponseEntity<UUID> create(T t);
+    ResponseEntity<?> create(T t);
 
     ResponseEntity<T> findById(UUID id);
 

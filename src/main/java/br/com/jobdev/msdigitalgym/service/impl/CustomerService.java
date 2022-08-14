@@ -4,6 +4,7 @@ import br.com.jobdev.msdigitalgym.entity.Customer;
 import br.com.jobdev.msdigitalgym.entity.Signature;
 import br.com.jobdev.msdigitalgym.repository.CustomerRepository;
 import br.com.jobdev.msdigitalgym.service.CustomerInterface;
+import br.com.jobdev.msdigitalgym.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,9 +25,15 @@ public class CustomerService implements CustomerInterface<Customer> {
     }
 
     @Override
-    public ResponseEntity<UUID> create(Customer customer) {
+    public ResponseEntity<?> create(Customer customer) {
         try {
+            customer.setCpf(StringUtils.keepNumbersOnly(customer.getCpf()));
+            customerRepository.findByCpf(customer.getCpf()).ifPresent(c -> {
+                throw new IllegalArgumentException("CPF already exists");
+            });
             return ResponseEntity.ok(customerRepository.save(customer).getId());
+        } catch (IllegalArgumentException e) {
+            return e.getMessage().equals("CPF already exists") ? ResponseEntity.badRequest().body(e.getMessage()) : ResponseEntity.status(500).build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

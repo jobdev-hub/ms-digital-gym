@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     List<Customer> findAllBySignatureActive(Boolean active);
+    Optional<Customer> findByCpf(String cpf);
 }
